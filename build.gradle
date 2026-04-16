@@ -19,9 +19,9 @@ sourceSets.main.resources {
 }
 
 repositories {
-    // Local flat-dir repo for JARs in the libs/ folder.
+    // Local flat-dir repo for JARs in the lib/ folder.
     flatDir {
-        dirs 'libs'
+        dirs 'lib'
     }
 }
 
@@ -70,10 +70,13 @@ configurations {
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
 
-    // Dev-only dependency mods (Create, Minecolonies, and their sub-deps).
-    // These end up on the run classpath only — not in the final artifact.
-    // See libs/README.md for download instructions.
-    localRuntime fileTree(dir: 'libs', include: '*.jar')
+    // Mixin annotation processor — generates the refmap at compile time.
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    // Dev-only dependency mods — visible at compile time (for mixins) and on the
+    // dev run classpath, but NOT included in the published artifact.
+    compileOnly fileTree(dir: 'lib', include: '*.jar')
+    localRuntime fileTree(dir: 'lib', include: '*.jar')
 }
 
 tasks.withType(ProcessResources).configureEach {
