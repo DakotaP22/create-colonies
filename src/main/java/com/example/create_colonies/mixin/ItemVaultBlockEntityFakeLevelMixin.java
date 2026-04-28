@@ -1,6 +1,5 @@
 package com.example.create_colonies.mixin;
 
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -17,14 +16,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * another vault's initCapability(), causing infinite recursion.
  *
  * Fix: skip initCapability entirely when not in a real ServerLevel or ClientLevel.
+ * ClientLevel is checked by class name to avoid referencing a client-only class in common code.
  */
 @Mixin(targets = "com.simibubi.create.content.logistics.vault.ItemVaultBlockEntity")
 public abstract class ItemVaultBlockEntityFakeLevelMixin {
 
+    private static final String CLIENT_LEVEL_CLASS = "net.minecraft.client.multiplayer.ClientLevel";
+
     @Inject(method = "initCapability", at = @At("HEAD"), cancellable = true, remap = false)
     private void create_colonies$skipCapabilityInitInFakeLevel(CallbackInfo ci) {
         Level level = ((BlockEntity) (Object) this).getLevel();
-        if (level != null && !(level instanceof ServerLevel) && !(level instanceof ClientLevel)) {
+        if (level != null
+                && !(level instanceof ServerLevel)
+                && !CLIENT_LEVEL_CLASS.equals(level.getClass().getName())) {
             ci.cancel();
         }
     }
