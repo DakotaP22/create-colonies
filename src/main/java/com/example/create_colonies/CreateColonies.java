@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import com.example.create_colonies.placement.BeltPlacementHandler;
+
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -21,6 +23,10 @@ public class CreateColonies {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            BeltPlacementHandler.register();
+            LOGGER.info("Registered Create belt placement handler.");
+        });
         LOGGER.info("Create Colonies common setup complete.");
     }
 }
